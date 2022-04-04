@@ -28,6 +28,13 @@ module.exports = {
                     "sass-loader",
                 ],
             },
+            {
+                test: /\.(png|jpe?g|gif|ico)$/i,
+                loader: "file-loader",
+                options: {
+                    name: "[name].[ext]",
+                },
+            },
         ],
     },
     plugins: [

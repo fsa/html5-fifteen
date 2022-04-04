@@ -1,4 +1,5 @@
 import "./styles.scss";
+import "./favicon.ico";
 
 const fieldSize = 4;
 const fieldNode = document.getElementById("game-field");
@@ -19,9 +20,7 @@ const wonField = [
     [13, 14, 15, 0],
 ];
 setFieldItemsPosition();
-document.getElementById("shuffle").addEventListener("click", (e) => {
-    console.log("Перемешать");
-});
+document.getElementById("shuffle").addEventListener("click", shuffle);
 fieldNode.addEventListener("click", (e) => {
     const buttonNode = e.target.closest("button");
     if (!buttonNode) {
@@ -104,4 +103,8 @@ function showWon() {
     setTimeout(() => {
         fieldNode.classList.remove(wonClass);
     }, 1000);
+}
+
+function shuffle() {
+    console.log('shuffle');
 }
