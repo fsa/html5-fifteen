@@ -12,6 +12,12 @@ const field = [
     [9, 10, 11, 12],
     [13, 14, 15, 0],
 ];
+const wonField = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 10, 11, 12],
+    [13, 14, 15, 0],
+];
 setFieldItemsPosition();
 document.getElementById("shuffle").addEventListener("click", (e) => {
     console.log("Перемешать");
@@ -21,8 +27,13 @@ fieldNode.addEventListener("click", (e) => {
     if (!buttonNode) {
         return;
     }
-    const buttonNumber = Number(buttonNode.getAttribute("item-id"));
-    moveFieldItem(buttonNumber);
+    const number = Number(buttonNode.getAttribute("item-id"));
+    if (swapFieldItem(number)) {
+        setFieldItemsPosition(itemNodes, field);
+        if (isWon(wonField)) {
+            showWon();
+        }
+    }
 });
 
 function getFieldElementNode(i) {
@@ -52,17 +63,16 @@ function setFieldItemPosition(node, x, y) {
     node.style.transform = `translate3D(${x * shiftPs}%, ${y * shiftPs}%, 0)`;
 }
 
-function moveFieldItem(number) {
+function swapFieldItem(number) {
     const buttonCoords = findCoords(number);
     const blankCoords = findCoords(0);
     const diff_x = Math.abs(blankCoords.x - buttonCoords.x);
     const diff_y = Math.abs(blankCoords.y - buttonCoords.y);
-    if ((diff_x+diff_y)!=1) {
+    if (diff_x + diff_y != 1) {
         return false;
     }
     field[buttonCoords.y][buttonCoords.x] = 0;
     field[blankCoords.y][blankCoords.x] = number;
-    setFieldItemsPosition(itemNodes, field);
     return true;
 }
 
@@ -75,4 +85,23 @@ function findCoords(number) {
         }
     }
     return null;
+}
+
+function isWon(wonField) {
+    for (let y = 0; y < field.length; y++) {
+        for (let x = 0; x < field[y].length; x++) {
+            if (field[y][x] !== wonField[y][x]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+const wonClass = "game-field-won";
+function showWon() {
+    fieldNode.classList.add(wonClass);
+    setTimeout(() => {
+        fieldNode.classList.remove(wonClass);
+    }, 1000);
 }
