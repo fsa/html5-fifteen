@@ -1,10 +1,13 @@
 import "./styles.scss";
 import "./favicon.ico";
 
-const fieldSize = 4;
+const fieldSize = {
+    x: 4,
+    y: 4
+};
 const fieldNode = document.getElementById("game-field");
 const itemNodes = [];
-for (let i = 1; i < fieldSize * fieldSize; i++) {
+for (let i = 1; i < fieldSize.x * fieldSize.y; i++) {
     itemNodes.push(fieldNode.appendChild(getFieldElementNode(i)));
 }
 const field = [
@@ -27,13 +30,25 @@ fieldNode.addEventListener("click", (e) => {
         return;
     }
     const number = Number(buttonNode.getAttribute("item-id"));
-    if (swapFieldItem(number)) {
-        setFieldItemsPosition(itemNodes, field);
-        if (isWon(wonField)) {
-            showWon();
-        }
-    }
+    swapFieldItem(number);
 });
+addEventListener("keydown", keydown);
+function keydown(event) {
+    switch (event.keyCode) {
+        case 37:
+            swapFieldItem(getNumberRight(findCoords(0)));
+            break;
+        case 38:
+            swapFieldItem(getNumberDown(findCoords(0)));
+            break;
+        case 39:
+            swapFieldItem(getNumberLeft(findCoords(0)));
+            break;
+        case 40:
+            swapFieldItem(getNumberUp(findCoords(0)));
+            break;
+    }
+}
 
 function getFieldElementNode(i) {
     let button = document.createElement("button");
@@ -63,6 +78,18 @@ function setFieldItemPosition(node, x, y) {
 }
 
 function swapFieldItem(number) {
+    if (moveFieldItem(number)) {
+        setFieldItemsPosition();
+        if (isWon(wonField)) {
+            showWon();
+        }
+    }
+}
+
+function moveFieldItem(number) {
+    if (!number || number >= fieldSize.x * fieldSize.y || number < 1) {
+        return;
+    }
     const buttonCoords = findCoords(number);
     const blankCoords = findCoords(0);
     const diff_x = Math.abs(blankCoords.x - buttonCoords.x);
@@ -106,5 +133,62 @@ function showWon() {
 }
 
 function shuffle() {
-    console.log('shuffle');
+    let lastNumber = 0;
+    for (let i = 0; i < 1000; i++) {
+        let Numbers = getNearby(lastNumber);
+        let num = Numbers[Math.floor(Math.random() * Numbers.length)];
+        moveFieldItem(num);
+        lastNumber = num;
+    }
+    setFieldItemsPosition();
+}
+
+function getNumberLeft(coords) {
+    if (coords.x < 1) {
+        return null;
+    }
+    return field[coords.y][coords.x - 1];
+}
+
+function getNumberRight(coords) {
+    if (coords.x >= fieldSize.x - 1) {
+        return null;
+    }
+    return field[coords.y][coords.x + 1];
+}
+
+function getNumberUp(coords) {
+    if (coords.y < 1) {
+        return null;
+    }
+    return field[coords.y - 1][coords.x];
+}
+
+function getNumberDown(coords) {
+    if (coords.y >= fieldSize.y - 1) {
+        return null;
+    }
+    return field[coords.y + 1][coords.x];
+}
+
+function getNearby(black = 0) {
+    const nearby = [];
+    const coords = findCoords(0);
+    const left = getNumberLeft(coords);
+    const right = getNumberRight(coords);
+    const uo = getNumberUp(coords);
+    const down = getNumberDown(coords);
+    if (left && left !== black) {
+        nearby.push(left);
+    }
+    if (right && right !== black) {
+        nearby.push(right);
+    }
+    if (uo && uo !== black) {
+        nearby.push(uo);
+    }
+    if (down && down !== black) {
+        nearby.push(down);
+    }
+    return nearby;
 }
