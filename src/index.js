@@ -2,22 +2,27 @@ import "./styles.scss";
 
 const fieldSize = 4;
 const fieldNode = document.getElementById("game-field");
-const itemNodes=[];
-for(let i=1;i<fieldSize*fieldSize;i++) {
+const itemNodes = [];
+for (let i = 1; i < fieldSize * fieldSize; i++) {
     itemNodes.push(fieldNode.appendChild(getFieldElementNode(i)));
 }
-const field=[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,0]];
-setFieldItemsPosition(itemNodes, field);
-document.getElementById("shuffle").addEventListener('click', (e)=>{
-    console.log('Перемешать');
+const field = [
+    [1, 2, 3, 4],
+    [5, 6, 7, 8],
+    [9, 10, 11, 12],
+    [13, 14, 15, 0],
+];
+setFieldItemsPosition();
+document.getElementById("shuffle").addEventListener("click", (e) => {
+    console.log("Перемешать");
 });
-fieldNode.addEventListener('click', (e)=>{
-    const buttonNode = e.target.closest('button');
+fieldNode.addEventListener("click", (e) => {
+    const buttonNode = e.target.closest("button");
     if (!buttonNode) {
         return;
     }
-    const button=Number(buttonNode.getAttribute('item-id'));
-    console.log(button);
+    const buttonNumber = Number(buttonNode.getAttribute("item-id"));
+    moveFieldItem(buttonNumber);
 });
 
 function getFieldElementNode(i) {
@@ -31,12 +36,12 @@ function getFieldElementNode(i) {
     return button;
 }
 
-function setFieldItemsPosition(nodes, field) {
-    for(let y=0; y<field.length; y++) {
-        for(let x=0; x<field[y].length; x++) {
+function setFieldItemsPosition() {
+    for (let y = 0; y < field.length; y++) {
+        for (let x = 0; x < field[y].length; x++) {
             let value = field[y][x];
-            if(value) {
-                setFieldItemPosition(nodes[value-1], x, y);
+            if (value) {
+                setFieldItemPosition(itemNodes[value - 1], x, y);
             }
         }
     }
@@ -44,5 +49,30 @@ function setFieldItemsPosition(nodes, field) {
 
 function setFieldItemPosition(node, x, y) {
     const shiftPs = 100;
-    node.style.transform = `translate3D(${x*shiftPs}%, ${y*shiftPs}%, 0)`;
+    node.style.transform = `translate3D(${x * shiftPs}%, ${y * shiftPs}%, 0)`;
+}
+
+function moveFieldItem(number) {
+    const buttonCoords = findCoords(number);
+    const blankCoords = findCoords(0);
+    const diff_x = Math.abs(blankCoords.x - buttonCoords.x);
+    const diff_y = Math.abs(blankCoords.y - buttonCoords.y);
+    if ((diff_x+diff_y)!=1) {
+        return false;
+    }
+    field[buttonCoords.y][buttonCoords.x] = 0;
+    field[blankCoords.y][blankCoords.x] = number;
+    setFieldItemsPosition(itemNodes, field);
+    return true;
+}
+
+function findCoords(number) {
+    for (let y = 0; y < field.length; y++) {
+        for (let x = 0; x < field[y].length; x++) {
+            if (field[y][x] === number) {
+                return { x, y };
+            }
+        }
+    }
+    return null;
 }
