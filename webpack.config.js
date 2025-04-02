@@ -4,7 +4,10 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-    mode: "production",
+    entry: "./src/index.js",
+    output: {
+        publicPath: "/html5-fifteen",
+    },
     module: {
         rules: [
             {
